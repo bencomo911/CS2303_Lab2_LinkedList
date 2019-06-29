@@ -1,0 +1,260 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jun 27 10:19:08 2019
+University of Texas at El Paso
+CS 2302 - Summer 2019
+Author: Dafne Bencomo
+Lab 2
+Instructor: Olac Fuentes
+TA: Ismael Villanueva-Miranda
+Last modified: 06/27/2019
+Purpose: The purpose of this program is to manipulate a linked list and provide
+          additional methods to facilitate use 
+"""
+class Node(object):
+    # Constructor
+    def __init__(self, data, next=None):  
+        self.data = data
+        self.next = next 
+
+class List(object):   
+    # Constructor
+    def __init__(self): 
+        self.head = None
+        self.tail = None
+        
+def Append(L, x):
+    if L.head is None:
+        L.head = Node(x)
+        L.tail = L.head
+    else:
+        L.tail.next = Node(x)
+        L.tail = L.tail.next
+        
+def IsEmpty(L):
+    return L.head == None
+        
+def Print(L):
+    if IsEmpty(L) == True:
+        print("Empty List")
+    else:
+        temp = L.head
+        while temp is not None:
+            print(temp.data, end=' ')
+            temp = temp.next
+        print()
+        
+def GetLength(L):
+    count=0
+    if IsEmpty(L) == True:
+        return 0
+    else:
+        temp = L.head
+        while temp is not None:
+            count+=1
+            temp = temp.next
+        return count
+
+def Search(L, x):
+    if IsEmpty(L) == True:
+        pass
+    else:
+        temp = L.head
+        while temp is not None:
+            if temp.data == x:
+                return True
+            temp = temp.next
+        return False
+
+'''
+Method Copy receives a reference-based singly-linked list and returns an 
+additional reference-based singly-linked list 'copy'
+'''            
+def Copy(L):
+    copy = List()
+    temp = L.head
+    while temp is not None: #traverses through each Node from the original L
+        Append(copy, temp.data) #appends each Node into the new list copy
+        temp = temp.next
+    return copy
+
+'''
+Method ItemAt receives two parameters, a reference-based linked list 'L' and an 
+integer 'i'and returns the data in the Node at 'i' in the list 
+'''
+def ItemAt(L, i):
+    if L.head is None:
+        print('Empty List')
+    if i > (GetLength(L)-1) or i < 0: #catches if a user chose an invalid i
+            print('LL does not contain', i, 'elements')
+            return
+    temp = L.head
+    for x in range(i):#iterates through list with temp until temp becomes desired Node at i
+        if temp is not None:
+            temp=temp.next
+    return temp.data
+ 
+'''
+Method Pop receives two parameters, a reference-based linked list 'L' and an
+optional integer 'ind' and removes or pops the Node at index 'ind'
+If 'ind' is not specified it removes the first Node in the list
+'''   
+def Pop(L, *ind):
+    if L.head is None:
+        print('Empty List')
+        return 
+    elif len(str(*ind)) == 0 or int(*ind)==0: #checks if parameter ind is specified
+        L.head = L.head.next #removes first element if not 
+        return 
+    elif int(*ind) > (GetLength(L)-1) or int(*ind) < 0: #checks if ind is a valid value
+            print('LL does not contain', *ind, 'elements')
+            return
+    elif GetLength(L) == 1: #if list has only one element it will clear the list
+        Clear()
+    temp = L.head
+    count=0
+    while count != (int(*ind)-1): #travels to the node right before one at 'ind'
+        temp = temp.next
+        count+=1
+    if temp.next == L.tail: #if 'ind' is the last element it updates the tail
+            temp.next = None
+            L.tail = temp
+            return
+    temp.next = temp.next.next
+    return
+            
+'''
+Method Count receives two parameters,  a reference-based linked list 'L' and an
+integer 'x' and returns an integer 'count' which represents the number of times
+the number 'x' was found in the list    
+'''
+def Count(L, x):
+    if L.head is None:
+        return 0
+    else:
+        temp = L.head
+        count=0
+        while temp is not None:
+            if temp.data == x: #compares wether the current Node data is x
+                count+=1
+            temp=temp.next
+        return count
+ 
+'''
+Method Index receives two parameters,  a reference-based linked list 'L'and an
+integer 'x' and returns the index of the first item whose value is equal to x
+in the list
+'''       
+def Index(L, x):
+    if L.head is None:
+        print('Empty List')
+    if Search(L, x) == False: #makes sure the element is present in the list
+        print('Element not in List')
+    else:
+        temp = L.head
+        count=0 #keeps track of the index
+        while temp is not None:
+            if temp.data == x:
+                return count
+            else:
+                temp = temp.next
+                count+=1
+        return count
+
+'''
+Method Clear receives a reference-based linked list 'L' and removes all 
+elements in the list
+'''    
+def Clear(L):
+    L.head = None
+    L.tail = None
+    return L
+
+'''
+Method SubList receives three parameters, a reference-based linked list 'L', 
+and two integers 'start' and 'end' and returns a new list 'sub'
+This method makes a new list from the given list which only contains the 
+elements indicated by the parameters 'start'(inclusive) and 
+'end' exclusive without modifying the original list 'L'
+'''
+def Sublist(L, start, end):
+    sub = List()
+    if L.head is None: #returns empty tree is L is empty
+        return sub
+    elif start < 0 or start >= GetLength(L): #checks for any index out of bounds
+        print('Check indeces')
+        return sub
+    elif end < 0 or end > GetLength(L) or start > end:#checks for index out of bounds
+        print('Check indeces')
+        return sub
+    else:
+        temp = L.head
+        startcount=0 #keeps track of indeces
+        endcount = (end-start) #number of iterations after knowing what Node to start on
+        while startcount != start:
+            temp = temp.next
+            startcount+=1
+        for i in range(endcount):
+            Append(sub, temp.data)
+            temp = temp.next
+        return sub
+
+'''
+Method Reverse receives a reference-based linked list 'L' and simply reverses
+the elements in the given list 'L' by traversing the linked list and copying
+the data elements onto an array then using that array to repopulate the same
+linked list
+'''    
+def Reverse(L):
+    temp = L.head
+    List = []
+    count = -1 #start from the end of the array back
+    while temp is not None: #used to copy data into array
+        List+=[temp.data]
+        temp = temp.next
+    t = L.head
+    while t is not None: #used to overwrite current data with new data from the array
+        t.data = List[count]
+        count-=1
+        t = t.next
+    return 
+        
+
+TestList = List()
+for i in range(5):
+    Append(TestList, i)
+Append(TestList, 2)
+#Append(TestList, 2)
+
+print('---original LL----')
+Print(TestList)
+print('---Reverse LL----')
+Reverse(TestList)
+Print(TestList)
+
+''''
+print('---original LL----')
+Print(TestList)
+print('---copy LL----')
+Print(Copy(TestList))
+print('---ItemAt LL----')
+x = ItemAt(TestList,4)
+print(x)
+print('---Count LL----')
+print(Count(TestList, 2))
+print('---Index LL----')
+print(Index(TestList, 2))
+print('---Sublist LL----')
+Print(Sublist(TestList, 2, 5))
+print('---List before Pop----')
+Print(TestList)
+print('---Pop LL----')
+Pop(TestList,6)
+Print(TestList)
+print('---Reverse LL----')
+Reverse(TestList)
+Print(TestList)
+print('---Clear LL----')
+Print(Clear(TestList))
+'''
